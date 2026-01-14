@@ -84,5 +84,28 @@
   </section>
 
   <p><a href="index.html">⬅ Torna all’elenco</a></p>
+
+<!-- Script LocalStorage -->
+  <script>
+    const input = document.getElementById('plantNameInput');
+    const display = document.getElementById('plantNameDisplay');
+
+    const storageKey = "aerangisName";
+
+    // Carica il nome salvato all'apertura
+    const savedName = localStorage.getItem(storageKey);
+    if(savedName){
+      display.textContent = savedName;
+      input.value = savedName;
+    }
+
+    // Aggiorna display e salva nel LocalStorage
+    input.addEventListener('input', () => {
+      const name = input.value || "Sconosciuta";
+      display.textContent = name;
+      localStorage.setItem(storageKey, name);
+    });
+  </script>
+  
 </body>
 </html>
