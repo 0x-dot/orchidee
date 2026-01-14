@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Creazione Scheda Orchidea</title>
+
+<style>
+body {
+  font-family: "Georgia", "Times New Roman", serif;
+  background: #efe8d8;
+  margin: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #3f4a3c;
+}
+
+form {
+  background: #fdf9f0;
+  padding: 15px;
+  border: 1.5px solid #8b7d65;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+form label {
+  display: block;
+  margin: 5px 0;
+  color: #4b4b3a;
+}
+
+form input, form select {
+  width: 100%;
+  padding: 4px 6px;
+  margin-top: 2px;
+  border-radius: 4px;
+  border: 1px solid #8b7d65;
+  background: #fffef9;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  background: #8b7d65;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #7a6d57;
+}
+
+/* Anteprima scheda */
+.label {
+  width: 250px;
+  padding: 10px;
+  box-sizing: border-box;
+  background: #fdf9f0;
+  border: 1.5px solid #8b7d65;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px #e7dcc8;
+  display: inline-block;
+  vertical-align: top;
+  margin: 10px;
+}
+
+.info h2 {
+  font-size: 14pt;
+  margin: 0 0 5px 0;
+  font-style: italic;
+  color: #3f4a3c;
+}
+
+.divider {
+  margin: 4px 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #8b7d65, transparent);
+}
+
+.info p {
+  font-size: 10pt;
+  margin: 2px 0;
+  color: #4b4b3a;
+}
+
+.plant-name {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.qr {
+  width: 60px;
+  height: 60px;
+  border: 1.5px solid #8b7d65;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7pt;
+  color: #6b6b5b;
+  background: #fffef9;
+  margin-top: 8px;
+}
+
+.qr img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Crea la tua Scheda Orchidea</h1>
+
+<form id="schedaForm">
+  <label>Nome botanico:
+    <input type="text" id="nomeBotanico" placeholder="Es: Aerangis mystacidii">
+  </label>
+  <label>Nome della pianta:
+    <input type="text" id="nomePianta" placeholder="Es: Mimi">
+  </label>
+  <label>Luce:
+    <select id="luce">
+      <option>media</option>
+      <option>medio-alta</option>
+      <option>bassa</option>
+    </select>
+  </label>
+  <label>Umidità:
+    <input type="text" id="umidita" placeholder="Es: 70–85%">
+  </label>
+  <label>Acqua:
+    <select id="acqua">
+      <option>Piovana</option>
+      <option>Distillata</option>
+      <option>Rubinetto decantato</option>
+    </select>
+  </label>
+  <label>Note:
+    <textarea id="note" rows="2" placeholder="Note aggiuntive"></textarea>
+  </label>
+
+  <button type="button" id="generaScheda">Genera Anteprima</button>
+</form>
+
+<div id="anteprimaScheda" class="label">
+  <div class="info">
+    <h2>Anteprima Scheda</h2>
+    <div class="divider"></div>
+    <p class="plant-name">Nome: ____________</p>
+    <p>Luce: --</p>
+    <p>Umidità: --</p>
+    <p>Acqua: --</p>
+    <p>Note: --</p>
+    <div class="qr">QR</div>
+  </div>
+</div>
+
+<button id="exportPDF">Esporta PDF</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+document.getElementById("generaScheda").addEventListener("click", () => {
+  const nomeBot = document.getElementById("nomeBotanico").value || "Nome botanico";
+  const nomeP = document.getElementById("nomePianta").value || "Nome pianta";
+  const luce = document.getElementById("luce").value;
+  const umidita = document.getElementById("umidita").value || "--";
+  const acqua = document.getElementById("acqua").value;
+  const note = document.getElementById("note").value || "--";
+
+  const anteprima = document.getElementById("anteprimaScheda");
+  anteprima.innerHTML = `
+    <div class="info">
+      <h2>${nomeBot}</h2>
+      <div class="divider"></div>
+      <p class="plant-name">Nome: ${nomeP}</p>
+      <p>Luce: ${luce}</p>
+      <p>Umidità: ${umidita}</p>
+      <p>Acqua: ${acqua}</p>
+      <p>Note: ${note}</p>
+      <div class="qr">QR</div>
+    </div>
+  `;
+});
+
+document.getElementById("exportPDF").addEventListener("click", () => {
+  const element = document.getElementById("anteprimaScheda");
+  html2pdf()
+    .set({
+      margin: 10,
+      filename: 'scheda-orchidea.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    })
+    .from(element)
+    .save();
+});
+</script>
+
+</body>
+</html>
