@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Creazione Scheda Orchidea</title>
-
 <style>
 body {
   font-family: "Georgia", "Times New Roman", serif;
@@ -30,7 +29,7 @@ form label {
   color: #4b4b3a;
 }
 
-form input, form select {
+form input, form select, form textarea {
   width: 100%;
   padding: 4px 6px;
   margin-top: 2px;
@@ -55,16 +54,20 @@ button:hover {
 
 /* Anteprima scheda */
 .label {
-  width: 250px;
+  width: 300px;
+  height: 180px;
   padding: 10px;
-  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
   background: #fdf9f0;
   border: 1.5px solid #8b7d65;
   border-radius: 8px;
   box-shadow: inset 0 0 0 2px #e7dcc8;
-  display: inline-block;
-  vertical-align: top;
-  margin: 10px;
+  margin-bottom: 20px;
+}
+
+.info {
+  width: 65%;
 }
 
 .info h2 {
@@ -99,10 +102,6 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 7pt;
-  color: #6b6b5b;
-  background: #fffef9;
-  margin-top: 8px;
 }
 
 .qr img {
@@ -157,7 +156,9 @@ button:hover {
     <p>Umidità: --</p>
     <p>Acqua: --</p>
     <p>Note: --</p>
-    <div class="qr">QR</div>
+  </div>
+  <div class="qr">
+    <img src="" alt="QR">
   </div>
 </div>
 
@@ -173,6 +174,9 @@ document.getElementById("generaScheda").addEventListener("click", () => {
   const acqua = document.getElementById("acqua").value;
   const note = document.getElementById("note").value || "--";
 
+  // Genera QR dinamico in base al nome botanico
+  const qrURL = `https://qrcode.tec-it.com/API/QRCode?data=${encodeURIComponent("https://esempio.com/" + nomeBot)}&backcolor=%23ffffff`;
+
   const anteprima = document.getElementById("anteprimaScheda");
   anteprima.innerHTML = `
     <div class="info">
@@ -183,7 +187,9 @@ document.getElementById("generaScheda").addEventListener("click", () => {
       <p>Umidità: ${umidita}</p>
       <p>Acqua: ${acqua}</p>
       <p>Note: ${note}</p>
-      <div class="qr">QR</div>
+    </div>
+    <div class="qr">
+      <img src="${qrURL}" alt="QR ${nomeBot}">
     </div>
   `;
 });
