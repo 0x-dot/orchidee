@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Creazione Scheda Orchidea</title>
+<title>Creazione Schede Orchidee</title>
 <style>
 body {
   font-family: "Georgia", "Times New Roman", serif;
@@ -52,7 +52,13 @@ button:hover {
   background: #7a6d57;
 }
 
-/* Anteprima scheda */
+/* Anteprima multipla */
+#anteprimaMultipla {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .label {
   width: 300px;
   height: 180px;
@@ -63,7 +69,6 @@ button:hover {
   border: 1.5px solid #8b7d65;
   border-radius: 8px;
   box-shadow: inset 0 0 0 2px #e7dcc8;
-  margin-bottom: 20px;
 }
 
 .info {
@@ -103,18 +108,12 @@ button:hover {
   align-items: center;
   justify-content: center;
 }
-
-.qr img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
 </style>
 </head>
 
 <body>
 
-<h1>Crea la tua Scheda Orchidea</h1>
+<h1>Crea le tue Schede Orchidee</h1>
 
 <form id="schedaForm">
   <label>Nome botanico:
@@ -144,29 +143,21 @@ button:hover {
     <textarea id="note" rows="2" placeholder="Note aggiuntive"></textarea>
   </label>
 
-  <button type="button" id="generaScheda">Genera Anteprima</button>
+  <button type="button" id="aggiungiScheda">Aggiungi Scheda</button>
 </form>
 
-<div id="anteprimaScheda" class="label">
-  <div class="info">
-    <h2>Anteprima Scheda</h2>
-    <div class="divider"></div>
-    <p class="plant-name">Nome: ____________</p>
-    <p>Luce: --</p>
-    <p>Umidità: --</p>
-    <p>Acqua: --</p>
-    <p>Note: --</p>
-  </div>
-  <div class="qr">
-    <img src="" alt="QR">
-  </div>
+<div id="anteprimaMultipla">
+  <!-- Tutte le schede aggiunte appariranno qui -->
 </div>
 
 <button id="exportPDF">Esporta PDF</button>
 
+<!-- Librerie -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script>
-document.getElementById("generaScheda").addEventListener("click", () => {
+document.getElementById("aggiungiScheda").addEventListener("click", () => {
   const nomeBot = document.getElementById("nomeBotanico").value || "Nome botanico";
   const nomeP = document.getElementById("nomePianta").value || "Nome pianta";
   const luce = document.getElementById("luce").value;
@@ -174,32 +165,48 @@ document.getElementById("generaScheda").addEventListener("click", () => {
   const acqua = document.getElementById("acqua").value;
   const note = document.getElementById("note").value || "--";
 
-  // Genera QR dinamico in base al nome botanico
-  const qrURL = `https://qrcode.tec-it.com/API/QRCode?data=${encodeURIComponent("https://esempio.com/" + nomeBot)}&backcolor=%23ffffff`;
+  const container = document.createElement("div");
+  container.className = "label";
 
-  const anteprima = document.getElementById("anteprimaScheda");
-  anteprima.innerHTML = `
-    <div class="info">
-      <h2>${nomeBot}</h2>
-      <div class="divider"></div>
-      <p class="plant-name">Nome: ${nomeP}</p>
-      <p>Luce: ${luce}</p>
-      <p>Umidità: ${umidita}</p>
-      <p>Acqua: ${acqua}</p>
-      <p>Note: ${note}</p>
-    </div>
-    <div class="qr">
-      <img src="${qrURL}" alt="QR ${nomeBot}">
-    </div>
+  // Box info
+  const infoDiv = document.createElement("div");
+  infoDiv.className = "info";
+  infoDiv.innerHTML = `
+    <h2>${nomeBot}</h2>
+    <div class="divider"></div>
+    <p class="plant-name">Nome: ${nomeP}</p>
+    <p>Luce: ${luce}</p>
+    <p>Umidità: ${umidita}</p>
+    <p>Acqua: ${acqua}</p>
+    <p>Note: ${note}</p>
   `;
+
+  // Box QR
+  const qrDiv = document.createElement("div");
+  qrDiv.className = "qr";
+
+  container.appendChild(infoDiv);
+  container.appendChild(qrDiv);
+
+  document.getElementById("anteprimaMultipla").appendChild(container);
+
+  // Genera QR dinamico in base64
+  new QRCode(qrDiv, {
+    text: "https://esempio.com/" + encodeURIComponent(nomeBot),
+    width: 60,
+    height: 60
+  });
+
+  // Reset form se vuoi
+  document.getElementById("schedaForm").reset();
 });
 
 document.getElementById("exportPDF").addEventListener("click", () => {
-  const element = document.getElementById("anteprimaScheda");
+  const element = document.getElementById("anteprimaMultipla");
   html2pdf()
     .set({
       margin: 10,
-      filename: 'scheda-orchidea.pdf',
+      filename: 'schede-orchidee.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
