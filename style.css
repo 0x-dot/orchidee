@@ -1,1 +1,28 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+  background: #f9f9f9;
+}
 
+h1 {
+  font-size: 1.6rem;
+}
+
+ul.scheda {
+  list-style: none;
+  padding: 0;
+}
+
+ul.scheda li {
+  background: #fff;
+  margin: 0.5rem 0;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+.note {
+  margin-top: 1rem;
+  font-style: italic;
+}
