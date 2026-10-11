@@ -1,17 +1,21 @@
 <header class="topbar">
-  <a routerLink="/" class="brand"><span class="leaf">❦</span> Digital garden <small>serra · schede di allevamento</small></a>
+  <a routerLink="/" class="brand"><span class="leaf">❦</span> {{ 'brand.name' | t }} <small>{{ 'brand.sub' | t }}</small></a>
   <nav>
     @if (auth.user(); as u) {
-      <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{exact: true}">Il mio giardino</a>
-      <a routerLink="/esplora" routerLinkActive="on">Esplora</a>
-      <a routerLink="/etichette" routerLinkActive="on">Etichette</a>
+      <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{exact: true}">{{ 'nav.garden' | t }}</a>
+      <a routerLink="/esplora" routerLinkActive="on">{{ 'nav.explore' | t }}</a>
+      <a routerLink="/etichette" routerLinkActive="on">{{ 'nav.labels' | t }}</a>
       <span class="who">{{ u.username }}</span>
-      <button class="btn ghost small" (click)="logout()">Esci</button>
+      <button class="btn ghost small" (click)="logout()">{{ 'nav.logout' | t }}</button>
     } @else {
-      <a routerLink="/esplora" routerLinkActive="on">Esplora</a>
-      <a routerLink="/accedi" routerLinkActive="on">Accedi</a>
+      <a routerLink="/esplora" routerLinkActive="on">{{ 'nav.explore' | t }}</a>
+      <a routerLink="/accedi" routerLinkActive="on">{{ 'nav.login' | t }}</a>
     }
+    <span class="lang" role="group" [attr.aria-label]="'lang.switch' | t" [attr.title]="'lang.switch' | t">
+      <button type="button" [class.on]="i18n.lang() === 'it'" (click)="i18n.set('it')">IT</button>
+      <button type="button" [class.on]="i18n.lang() === 'en'" (click)="i18n.set('en')">EN</button>
+    </span>
   </nav>
 </header>
 <main class="page"><router-outlet /></main>
-<footer class="foot">Fatto con cura per le orchidee · <span class="leaf">❦</span></footer>
+<footer class="foot">{{ 'footer' | t }} · <span class="leaf">❦</span></footer>

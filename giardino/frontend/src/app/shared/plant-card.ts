@@ -1,20 +1,21 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TPipe } from '../i18n';
 import { Plant } from '../models';
 
 @Component({
   selector: 'app-plant-card',
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe],
   template: `
     <a class="specimen paper" [routerLink]="['/piante', plant().id]">
-      <span class="catno">N° {{ pad(plant().id) }}</span>
+      <span class="catno">{{ 'card.no' | t:{ n: pad(plant().id) } }}</span>
       <h3 class="latin">{{ plant().botanicalName }}</h3>
       <div class="divider"></div>
       @if (plant().nickname) { <p class="nick">«{{ plant().nickname }}»</p> }
-      @if (plant().sheet['luce']) { <p class="meta">Luce: {{ plant().sheet['luce'] }}</p> }
-      @if (plant().sheet['umidita']) { <p class="meta">Umidità: {{ plant().sheet['umidita'] }}</p> }
+      @if (plant().sheet['luce']) { <p class="meta">{{ 'card.light' | t }}: {{ plant().sheet['luce'] }}</p> }
+      @if (plant().sheet['umidita']) { <p class="meta">{{ 'card.humidity' | t }}: {{ plant().sheet['umidita'] }}</p> }
       <p class="foot">
-        @if (showOwner()) { di <b>{{ plant().owner }}</b> } @else { {{ plant().public ? '🌍 pubblica' : '🔒 privata' }} }
+        @if (showOwner()) { {{ 'card.by' | t }} <b>{{ plant().owner }}</b> } @else { {{ (plant().public ? 'card.public' : 'card.private') | t }} }
       </p>
     </a>`,
   styles: `

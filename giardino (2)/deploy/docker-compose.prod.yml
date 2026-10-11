@@ -1,0 +1,31 @@
+# Compose per la VM: app Go (immagine caricata da deploy.sh) + Caddy per HTTPS automatico.
+services:
+  giardino:
+    image: giardino:latest
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      COOKIE_SECURE: "1"          # in produzione c'è HTTPS (Caddy)
+    volumes:
+      - ./data:/data              # garden.db + photos/ stanno sul disco della VM
+    mem_limit: 300m
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - giardino
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?scrivi DOMAIN=... nel file .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data          # certificati: non perderli o rifai la richiesta
+      - caddy_config:/config
+    mem_limit: 150m
+
+volumes:
+  caddy_data:
+  caddy_config:

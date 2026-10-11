@@ -1,30 +1,31 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../auth';
-import { errMsg, Plant, SHEET_FIELDS } from '../models';
+import { I18n, TPipe } from '../i18n';
+import { errKey, Plant, SHEET_FIELDS } from '../models';
 import { PlantsApi } from '../plants-api';
 import { Timeline } from '../shared/timeline';
 
 @Component({
   selector: 'app-plant-detail',
-  imports: [RouterLink, Timeline],
+  imports: [RouterLink, Timeline, TPipe],
   template: `
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    @if (error()) { <p class="error">{{ error() | t }}</p> }
     @if (plant(); as p) {
       <article class="paper">
         <div class="row between">
-          <span class="catno">N° {{ pad(p.id) }} · {{ p.public ? 'scheda pubblica' : 'scheda privata' }}</span>
-          <span class="muted">di {{ p.owner }}</span>
+          <span class="catno">{{ 'card.no' | t:{ n: pad(p.id) } }} · {{ (p.public ? 'detail.public' : 'detail.private') | t }}</span>
+          <span class="muted">{{ 'detail.by' | t:{ owner: p.owner } }}</span>
         </div>
         <h1 class="latin">{{ p.botanicalName }}</h1>
         <div class="divider"></div>
         @if (p.nickname) { <p class="nick">«{{ p.nickname }}»</p> }
-        @if (p.acquiredAt) { <p class="muted">Nel giardino dal {{ p.acquiredAt }}</p> }
+        @if (p.acquiredAt) { <p class="muted">{{ 'detail.since' | t:{ date: i18n.date(p.acquiredAt) } }}</p> }
 
         @for (f of fields; track f.key) {
           @if (p.sheet[f.key]) {
             <section>
-              <h2>{{ f.label }}</h2>
+              <h2>{{ 'field.' + f.key + '.label' | t }}</h2>
               <p class="val">{{ p.sheet[f.key] }}</p>
             </section>
           }
@@ -34,15 +35,15 @@ import { Timeline } from '../shared/timeline';
       <app-timeline [plantId]="p.id" [editable]="isOwner()" />
 
       <div class="row actions noprint">
-        <a class="btn ghost" routerLink="/esplora">⬅ Torna all'elenco</a>
-        <button class="btn ghost" (click)="print()">🖨 Stampa scheda</button>
+        <a class="btn ghost" routerLink="/esplora">{{ 'detail.back' | t }}</a>
+        <button class="btn ghost" (click)="print()">{{ 'detail.print' | t }}</button>
         @if (isOwner()) {
-          <a class="btn" [routerLink]="['/piante', p.id, 'modifica']">Modifica</a>
-          <button class="btn danger" (click)="remove(p)">Elimina</button>
+          <a class="btn" [routerLink]="['/piante', p.id, 'modifica']">{{ 'detail.edit' | t }}</a>
+          <button class="btn danger" (click)="remove(p)">{{ 'detail.delete' | t }}</button>
         } @else if (auth.user()) {
-          <button class="btn" (click)="copy(p)">Copia nel mio giardino</button>
+          <button class="btn" (click)="copy(p)">{{ 'detail.copy' | t }}</button>
         } @else {
-          <a class="btn" routerLink="/accedi">Accedi per copiarla</a>
+          <a class="btn" routerLink="/accedi">{{ 'detail.loginToCopy' | t }}</a>
         }
       </div>
     }`,
@@ -57,6 +58,7 @@ import { Timeline } from '../shared/timeline';
 export class PlantDetail {
   id = input.required<string>();
   auth = inject(Auth);
+  i18n = inject(I18n);
   private api = inject(PlantsApi);
   private router = inject(Router);
   fields = SHEET_FIELDS;
@@ -67,7 +69,7 @@ export class PlantDetail {
     effect(() => {
       const id = this.id();
       this.plant.set(null); this.error.set('');
-      this.api.get(id).then(p => this.plant.set(p)).catch(e => this.error.set(errMsg(e)));
+      this.api.get(id).then(p => this.plant.set(p)).catch(e => this.error.set(errKey(e)));
     });
   }
 
@@ -77,12 +79,12 @@ export class PlantDetail {
 
   async copy(p: Plant) {
     try { const c = await this.api.copy(p.id); this.router.navigate(['/piante', c.id, 'modifica']); }
-    catch (e) { this.error.set(errMsg(e)); }
+    catch (e) { this.error.set(errKey(e)); }
   }
 
   async remove(p: Plant) {
-    if (!confirm(`Eliminare «${p.botanicalName}» dal tuo giardino?`)) return;
+    if (!confirm(this.i18n.t('detail.confirmDelete', { name: p.botanicalName }))) return;
     try { await this.api.remove(p.id); this.router.navigate(['/']); }
-    catch (e) { this.error.set(errMsg(e)); }
+    catch (e) { this.error.set(errKey(e)); }
   }
 }

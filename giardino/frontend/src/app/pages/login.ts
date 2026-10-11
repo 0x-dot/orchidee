@@ -2,29 +2,30 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '../auth';
-import { errMsg } from '../models';
+import { TPipe } from '../i18n';
+import { errKey } from '../models';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, TPipe],
   template: `
     <section class="paper box">
-      <h1>{{ mode() === 'login' ? 'Bentornato in serra' : 'Apri il tuo giardino' }}</h1>
-      <p class="lead">Un piccolo giardino digitale per le tue orchidee: schede di allevamento, storico di crescita e condivisione.</p>
+      <h1>{{ (mode() === 'login' ? 'login.titleLogin' : 'login.titleRegister') | t }}</h1>
+      <p class="lead">{{ 'login.lead' | t }}</p>
       <div class="divider"></div>
       <form (ngSubmit)="submit()">
-        <label class="f">Nome utente
+        <label class="f">{{ 'login.username' | t }}
           <input name="u" [(ngModel)]="username" autocomplete="username" required>
         </label>
-        <label class="f">Password
+        <label class="f">{{ 'login.password' | t }}
           <input name="p" type="password" [(ngModel)]="password" required
                  [attr.autocomplete]="mode() === 'login' ? 'current-password' : 'new-password'">
         </label>
-        @if (error()) { <p class="error">{{ error() }}</p> }
+        @if (error()) { <p class="error">{{ error() | t }}</p> }
         <div class="row between">
-          <button class="btn" [disabled]="busy()">{{ mode() === 'login' ? 'Entra' : 'Crea account' }}</button>
+          <button class="btn" [disabled]="busy()">{{ (mode() === 'login' ? 'login.submitLogin' : 'login.submitRegister') | t }}</button>
           <button type="button" class="btn ghost" (click)="toggle()">
-            {{ mode() === 'login' ? 'Non hai un account?' : 'Ho già un account' }}
+            {{ (mode() === 'login' ? 'login.toRegister' : 'login.toLogin') | t }}
           </button>
         </div>
       </form>
@@ -48,7 +49,7 @@ export class Login {
       if (this.mode() === 'login') await this.auth.login(this.username, this.password);
       else await this.auth.register(this.username, this.password);
       this.router.navigate(['/']);
-    } catch (e) { this.error.set(errMsg(e)); }
+    } catch (e) { this.error.set(errKey(e)); }
     this.busy.set(false);
   }
 }

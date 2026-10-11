@@ -1,48 +1,49 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { emptyPlant, errMsg, Plant, SHEET_FIELDS } from '../models';
+import { TPipe } from '../i18n';
+import { emptyPlant, errKey, Plant, SHEET_FIELDS } from '../models';
 import { PlantsApi } from '../plants-api';
 
 @Component({
   selector: 'app-plant-form',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, TPipe],
   template: `
-    <h1>{{ isNew() ? 'Nuova pianta' : 'Modifica scheda' }}</h1>
+    <h1>{{ (isNew() ? 'form.titleNew' : 'form.titleEdit') | t }}</h1>
     @if (plant(); as p) {
       <form class="paper" (ngSubmit)="save()">
-        <label class="f">Nome botanico *
-          <input name="bot" [(ngModel)]="p.botanicalName" placeholder="Es: Aerangis mystacidii" required maxlength="120">
+        <label class="f">{{ 'form.botanical' | t }}
+          <input name="bot" [(ngModel)]="p.botanicalName" [placeholder]="'form.botanicalPh' | t" required maxlength="120">
         </label>
         <div class="two">
-          <label class="f">Il nome della tua pianta
-            <input name="nick" [(ngModel)]="p.nickname" placeholder="Es: patate fiorite" maxlength="120">
+          <label class="f">{{ 'form.nickname' | t }}
+            <input name="nick" [(ngModel)]="p.nickname" [placeholder]="'form.nicknamePh' | t" maxlength="120">
           </label>
-          <label class="f">Nel giardino dal
+          <label class="f">{{ 'form.acquired' | t }}
             <input name="acq" type="date" [(ngModel)]="p.acquiredAt">
           </label>
         </div>
         <div class="divider"></div>
 
         @for (f of fields; track f.key) {
-          <label class="f">{{ f.label }}
+          <label class="f">{{ 'field.' + f.key + '.label' | t }}
             @if (f.long) {
-              <textarea [name]="f.key" rows="3" [(ngModel)]="p.sheet[f.key]" [placeholder]="f.hint ?? ''" maxlength="2000"></textarea>
+              <textarea [name]="f.key" rows="3" [(ngModel)]="p.sheet[f.key]" [placeholder]="f.hint ? ('field.' + f.key + '.hint' | t) : ''" maxlength="2000"></textarea>
             } @else {
-              <input [name]="f.key" [(ngModel)]="p.sheet[f.key]" [placeholder]="f.hint ?? ''" maxlength="2000">
+              <input [name]="f.key" [(ngModel)]="p.sheet[f.key]" [placeholder]="f.hint ? ('field.' + f.key + '.hint' | t) : ''" maxlength="2000">
             }
           </label>
         }
 
         <label class="check">
           <input type="checkbox" name="pub" [(ngModel)]="p.public">
-          Rendi pubblica questa scheda (gli altri potranno vederla e copiarla; nome personale e storico restano tuoi)
+          {{ 'form.public' | t }}
         </label>
 
-        @if (error()) { <p class="error">{{ error() }}</p> }
+        @if (error()) { <p class="error">{{ error() | t }}</p> }
         <div class="row">
-          <button class="btn" [disabled]="busy()">Salva</button>
-          <a class="btn ghost" [routerLink]="isNew() ? '/' : ['/piante', p.id]">Annulla</a>
+          <button class="btn" [disabled]="busy()">{{ 'form.save' | t }}</button>
+          <a class="btn ghost" [routerLink]="isNew() ? '/' : ['/piante', p.id]">{{ 'form.cancel' | t }}</a>
         </div>
       </form>
     }`,
@@ -64,7 +65,7 @@ export class PlantForm {
       this.api.get(id).then(p => {
         SHEET_FIELDS.forEach(f => (p.sheet[f.key] ??= ''));
         this.plant.set(p);
-      }).catch(e => this.error.set(errMsg(e)));
+      }).catch(e => this.error.set(errKey(e)));
     });
   }
 
@@ -77,7 +78,7 @@ export class PlantForm {
     try {
       const saved = this.isNew() ? await this.api.create(p) : await this.api.update(p);
       this.router.navigate(['/piante', saved.id]);
-    } catch (e) { this.error.set(errMsg(e)); }
+    } catch (e) { this.error.set(errKey(e)); }
     this.busy.set(false);
   }
 }

@@ -1,16 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
+import { TPipe } from '../i18n';
 import { Plant } from '../models';
 import { PlantsApi } from '../plants-api';
 import { PlantCard } from '../shared/plant-card';
 
 @Component({
   selector: 'app-explore',
-  imports: [PlantCard],
+  imports: [PlantCard, TPipe],
   template: `
-    <h1>Esplora i giardini</h1>
-    <p class="lead">Le schede di allevamento che gli altri hanno scelto di condividere. Aprine una per copiarla nel tuo giardino.</p>
-    @if (loading()) { <p class="muted">Sto cercando tra le aiuole…</p> }
-    @else if (plants().length === 0) { <p class="muted">Nessuna scheda pubblica per ora.</p> }
+    <h1>{{ 'explore.title' | t }}</h1>
+    <p class="lead">{{ 'explore.lead' | t }}</p>
+    @if (loading()) { <p class="muted">{{ 'explore.loading' | t }}</p> }
+    @else if (plants().length === 0) { <p class="muted">{{ 'explore.empty' | t }}</p> }
     @else {
       <div class="grid">
         @for (p of plants(); track p.id) { <app-plant-card [plant]="p" [showOwner]="true" /> }

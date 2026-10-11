@@ -1,0 +1,144 @@
+key,it,en
+app.title,Giardino digitale · Serra,Digital garden · Greenhouse
+brand.name,Giardino digitale,Digital garden
+brand.sub,serra · schede di coltivazione,greenhouse · plant care sheets
+nav.garden,Il mio giardino,My garden
+nav.explore,Esplora,Explore
+nav.labels,Etichette,Labels
+nav.login,Accedi,Sign in
+nav.logout,Esci,Sign out
+lang.switch,Cambia lingua,Change language
+footer,Fatto con cura per le tue piante,Made with care for your plants
+login.titleLogin,Bentornato in serra,Welcome back to the greenhouse
+login.titleRegister,Apri il tuo giardino,Start your garden
+login.lead,"Un piccolo giardino digitale per le tue piante: schede di coltivazione, storico di crescita e condivisione.","A small digital garden for your plants: care sheets, growth history and sharing."
+login.username,Nome utente,Username
+login.password,Password,Password
+login.submitLogin,Entra,Sign in
+login.submitRegister,Crea account,Create account
+login.toRegister,Non hai un account?,No account yet?
+login.toLogin,Ho già un account,I already have an account
+garden.title,Il giardino di {name},{name}'s garden
+garden.lead,"Le tue piante, con le loro schede di coltivazione.","Your plants, with their care sheets."
+garden.new,+ Nuova pianta,+ New plant
+garden.loading,Sto annaffiando…,Watering…
+garden.empty,Il giardino è ancora vuoto.,Your garden is still empty.
+garden.emptyHint1,"Aggiungi la tua prima pianta, oppure","Add your first plant, or"
+garden.emptyHintLink,esplora le schede degli altri,browse other people's sheets
+garden.emptyHint2,e copiane una.,and copy one.
+garden.seed,🌿 Aggiungi 3 schede di esempio,🌿 Add 3 sample sheets
+explore.title,Esplora i giardini,Explore gardens
+explore.lead,Le schede di coltivazione che gli altri hanno scelto di condividere. Aprine una per copiarla nel tuo giardino.,Care sheets that other people chose to share. Open one to copy it into your garden.
+explore.loading,Sto cercando tra le aiuole…,Looking through the flower beds…
+explore.empty,Nessuna scheda pubblica per ora.,No public sheets yet.
+card.no,N° {n},No. {n}
+card.light,Luce,Light
+card.humidity,Umidità,Humidity
+card.by,di,by
+card.public,🌍 pubblica,🌍 public
+card.private,🔒 privata,🔒 private
+detail.public,scheda pubblica,public sheet
+detail.private,scheda privata,private sheet
+detail.by,di {owner},by {owner}
+detail.since,Nel giardino dal {date},In the garden since {date}
+detail.back,⬅ Torna all'elenco,⬅ Back to the list
+detail.print,🖨 Stampa scheda,🖨 Print sheet
+detail.edit,Modifica,Edit
+detail.delete,Elimina,Delete
+detail.copy,Copia nel mio giardino,Copy to my garden
+detail.loginToCopy,Accedi per copiarla,Sign in to copy it
+detail.confirmDelete,Eliminare «{name}» dal tuo giardino?,Delete “{name}” from your garden?
+form.titleNew,Nuova pianta,New plant
+form.titleEdit,Modifica scheda,Edit sheet
+form.botanical,Nome botanico *,Botanical name *
+form.botanicalPh,Es: Aerangis mystacidii,E.g. Aerangis mystacidii
+form.nickname,Il nome della tua pianta,Your plant's name
+form.nicknamePh,Es: Mimì,E.g. Mimi
+form.acquired,Nel giardino dal,In the garden since
+form.public,Rendi pubblica questa scheda (gli altri potranno vederla e copiarla; nome personale e storico restano tuoi),Make this sheet public (others can view and copy it; your plant's name and growth history stay yours)
+form.save,Salva,Save
+form.cancel,Annulla,Cancel
+field.origine.label,Origine e habitat,Origin and habitat
+field.origine.hint,Es: Madagascar e Africa orientale. Epifita in foreste umide.,E.g. Madagascar and East Africa. Epiphyte in humid forests.
+field.crescita.label,Tipo di crescita,Growth habit
+field.crescita.hint,"Es: Monopodiale, compatta","E.g. Monopodial, compact"
+field.luce.label,Luce,Light
+field.luce.hint,"Es: Media (8.000–12.000 lux), no sole diretto","E.g. Medium (8,000–12,000 lux), no direct sun"
+field.temperatura.label,Temperatura,Temperature
+field.temperatura.hint,Giorno: 22–26 °C · Notte: 16–18 °C,Day: 22–26 °C · Night: 16–18 °C
+field.umidita.label,Umidità,Humidity
+field.umidita.hint,Es: 60–80%,E.g. 60–80%
+field.ventilazione.label,Ventilazione,Air movement
+field.ventilazione.hint,Es: Costante ma delicata,E.g. Constant but gentle
+field.substrato.label,Substrato / Supporto,Substrate / Support
+field.substrato.hint,Es: Bark fine in vaso trasparente,E.g. Fine bark in a clear pot
+field.annaffiatura.label,Annaffiatura,Watering
+field.annaffiatura.hint,Estate: … · Inverno: …,Summer: … · Winter: …
+field.acqua.label,Tipo di acqua,Water type
+field.acqua.hint,"Piovana, distillata, rubinetto decantato…","Rainwater, distilled, settled tap water…"
+field.fertilizzazione.label,Fertilizzazione,Fertilizing
+field.fertilizzazione.hint,Es: 20-20-20 a 1/4 dose ogni 2 annaffiature,E.g. 20-20-20 at 1/4 strength every 2nd watering
+field.riposo.label,Riposo,Dormancy
+field.riposo.hint,Es: Leggero in inverno,E.g. Light rest in winter
+field.fioritura.label,Fioritura,Flowering
+field.fioritura.hint,"Es: Primavera–estate, profumata di notte","E.g. Spring–summer, scented at night"
+field.note.label,Note di coltivazione,Growing notes
+timeline.title,Storico di crescita,Growth history
+timeline.add,+ Aggiungi una voce,+ Add an entry
+timeline.date,Data,Date
+timeline.kind,Cosa è successo,What happened
+timeline.note,Nota,Note
+timeline.notePh,"Es: due nuove radici verdi, spuntata la terza foglia…","E.g. two new green roots, third leaf unfolding…"
+timeline.photo,Foto,Photo
+timeline.preview,anteprima,preview
+timeline.submit,Aggiungi allo storico,Add to history
+timeline.saving,Salvo…,Saving…
+timeline.empty,Ancora nessuna voce nello storico.,No history entries yet.
+timeline.confirmDelete,Eliminare questa voce dallo storico?,Delete this history entry?
+timeline.unreadable,"Impossibile leggere questa immagine (HEIC non è supportato: usa JPG, PNG o WebP).","Can't read this image (HEIC isn't supported: use JPG, PNG or WebP)."
+timeline.needContent,Aggiungi una nota o una foto.,Add a note or a photo.
+kind.nota,Nota,Note
+kind.radice,Nuova radice,New root
+kind.foglia,Nuova foglia,New leaf
+kind.germoglio,Nuovo germoglio,New shoot
+kind.fioritura,Fioritura,Flowering
+kind.rinvaso,Rinvaso,Repotting
+kind.trattamento,Trattamento,Treatment
+labels.title,Etichette da stampare,Printable labels
+labels.lead,"Scegli le piante: ottieni un PDF A4 con 10 etichette per foglio (90×50 mm), ognuna con un QR che porta alla scheda online.","Choose your plants: you get an A4 PDF with 10 labels per sheet (90×50 mm), each with a QR code linking to the online sheet."
+labels.loading,Carico il giardino…,Loading your garden…
+labels.none,Non hai ancora piante.,You don't have any plants yet.
+labels.addOne,Aggiungine una,Add one
+labels.selectAll,Seleziona tutte,Select all
+labels.deselectAll,Deseleziona tutte,Deselect all
+labels.count,{n} su {total} selezionate,{n} of {total} selected
+labels.privateTip,Scheda privata: il QR funziona solo per te,Private sheet: the QR only works for you
+labels.privateNote,🔒 Il QR di una scheda privata funziona solo da loggato. Rendi pubblica la scheda se vuoi che chi la scansiona possa vederla.,🔒 The QR of a private sheet only works when signed in. Make the sheet public if you want people who scan it to see it.
+labels.download,Scarica PDF,Download PDF
+labels.preparing,Preparo il PDF…,Preparing the PDF…
+labels.filename,etichette-piante.pdf,plant-labels.pdf
+pdf.name,Nome,Name
+pdf.light,Luce,Light
+pdf.humidity,Umidità,Humidity
+pdf.water,Acqua,Water
+pdf.notes,Note,Notes
+err.generic,"Qualcosa è andato storto, riprova.","Something went wrong, please try again."
+err.internal,"Errore interno, riprova tra poco.","Internal error, please try again shortly."
+err.invalid_json,Richiesta non valida.,Invalid request.
+err.unauthenticated,Devi accedere per farlo.,You need to sign in to do that.
+err.username_format,"Nome utente: da 3 a 30 caratteri tra lettere, numeri, _ . -","Username: 3 to 30 characters from letters, numbers, _ . -"
+err.password_length,La password deve avere tra 8 e 72 caratteri.,The password must be between 8 and 72 characters.
+err.username_taken,Nome utente già in uso.,Username already taken.
+err.bad_credentials,Credenziali non valide.,Invalid credentials.
+err.name_required,Il nome botanico è obbligatorio.,The botanical name is required.
+err.field_too_long,Un campo è troppo lungo.,A field is too long.
+err.text_too_long,Testo troppo lungo (massimo 2000 caratteri).,Text too long (2000 characters maximum).
+err.invalid_id,Identificativo non valido.,Invalid identifier.
+err.not_found,Non trovato.,Not found.
+err.upload_too_big,Richiesta non valida o foto troppo pesante (massimo 8 MB).,Invalid request or photo too large (8 MB maximum).
+err.invalid_date,Data non valida.,Invalid date.
+err.invalid_kind,Tipo di voce non valido.,Invalid entry type.
+err.empty_entry,Aggiungi una nota o una foto.,Add a note or a photo.
+err.photo_format,"Formato non supportato: usa JPG, PNG o WebP.","Unsupported format: use JPG, PNG or WebP."
+err.photo_too_large,Immagine troppo grande.,Image too large.
+err.photo_invalid,Immagine non valida.,Invalid image.

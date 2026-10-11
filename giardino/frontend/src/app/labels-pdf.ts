@@ -6,7 +6,9 @@ const MX = (210 - COLS * W - GX) / 2;
 const MY = (297 - ROWS * H - (ROWS - 1) * GY) / 2;
 const QR = 22;
 
-export async function buildLabelsPdf(plants: Plant[], origin: string): Promise<Blob> {
+export interface LabelTexts { name: string; light: string; humidity: string; water: string; notes: string; }
+
+export async function buildLabelsPdf(plants: Plant[], origin: string, txt: LabelTexts): Promise<Blob> {
   const { jsPDF } = await import('jspdf');
   const qrMod: any = await import('qrcode');
   const toDataURL: (t: string, o: object) => Promise<string> = (qrMod.default ?? qrMod).toDataURL;
@@ -55,16 +57,16 @@ export async function buildLabelsPdf(plants: Plant[], origin: string): Promise<B
 
     doc.setFontSize(9);
     doc.setTextColor(75, 75, 58);
-    const rows: [string, string, number][] = [
-      ['Nome', p.nickname, 1],
-      ['Luce', p.sheet['luce'], 2],
-      ['Umidità', p.sheet['umidita'], 1],
-      ['Acqua', p.sheet['acqua'], 1],
-      ['Note', p.sheet['note'], 2],
+    const rows: [string, string, string, number][] = [
+      ['name', txt.name, p.nickname, 1],
+      ['light', txt.light, p.sheet['luce'], 2],
+      ['humidity', txt.humidity, p.sheet['umidita'], 1],
+      ['water', txt.water, p.sheet['acqua'], 1],
+      ['notes', txt.notes, p.sheet['note'], 2],
     ];
-    for (const [label, value, max] of rows) {
+    for (const [id, label, value, max] of rows) {
       if (!value) continue;
-      doc.setFont('times', label === 'Nome' ? 'bolditalic' : 'normal');
+      doc.setFont('times', id === 'name' ? 'bolditalic' : 'normal');
       const lines = fit(`${label}: ${value}`, tw, max);
       lines.forEach(l => { if (ty < y + H - 3) doc.text(l, tx, ty); ty += 4; });
     }

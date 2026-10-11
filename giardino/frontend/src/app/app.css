@@ -10,3 +10,6 @@ nav a:hover, nav a.on { border-bottom-color:var(--gold); }
 .page { max-width:1000px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
 .foot { text-align:center; padding:1.2rem; color:var(--seppia); font-size:.85rem; }
 @media print { .topbar, .foot { display:none; } }
+.lang { display:inline-flex; border:1px solid #f3ecd9; border-radius:5px; overflow:hidden; }
+.lang button { font: inherit; font-size:.78rem; letter-spacing:.06em; background:transparent; color:#f3ecd9; border:0; padding:.15rem .5rem; cursor:pointer; }
+.lang button.on { background:#f3ecd9; color:var(--sage-dark); }

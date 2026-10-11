@@ -45,7 +45,7 @@ func writeErr(w http.ResponseWriter, status int, msg string) {
 func readJSON(w http.ResponseWriter, r *http.Request, v any) bool {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
-		writeErr(w, http.StatusBadRequest, "JSON non valido")
+		writeErr(w, http.StatusBadRequest, "invalid_json")
 		return false
 	}
 	return true
@@ -101,7 +101,7 @@ func (s *Server) auth(next func(http.ResponseWriter, *http.Request, *User)) http
 	return func(w http.ResponseWriter, r *http.Request) {
 		u := s.userFromRequest(r)
 		if u == nil {
-			writeErr(w, http.StatusUnauthorized, "non autenticato")
+			writeErr(w, http.StatusUnauthorized, "unauthenticated")
 			return
 		}
 		next(w, r.WithContext(context.WithValue(r.Context(), userKey, u)), u)
@@ -128,26 +128,26 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	c.Username = strings.TrimSpace(c.Username)
 	if !usernameRe.MatchString(c.Username) {
-		writeErr(w, 400, "username: 3–30 caratteri tra lettere, numeri, _ . -")
+		writeErr(w, 400, "username_format")
 		return
 	}
 	if len(c.Password) < 8 || len(c.Password) > 72 { // 72 = limite bcrypt
-		writeErr(w, 400, "la password deve avere tra 8 e 72 caratteri")
+		writeErr(w, 400, "password_length")
 		return
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	res, err := s.db.Exec(`INSERT INTO users(username,password_hash) VALUES(?,?)`, c.Username, string(hash))
 	if err != nil {
-		writeErr(w, 409, "username già in uso")
+		writeErr(w, 409, "username_taken")
 		return
 	}
 	id, _ := res.LastInsertId()
 	if err := s.startSession(w, id); err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	writeJSON(w, 201, User{ID: id, Username: c.Username})
@@ -163,11 +163,11 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	err := s.db.QueryRow(`SELECT id, username, password_hash FROM users WHERE username = ?`,
 		strings.TrimSpace(c.Username)).Scan(&u.ID, &u.Username, &hash)
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(hash), []byte(c.Password)) != nil {
-		writeErr(w, 401, "credenziali non valide")
+		writeErr(w, 401, "bad_credentials")
 		return
 	}
 	if err := s.startSession(w, u.ID); err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	writeJSON(w, 200, u)

@@ -85,16 +85,16 @@ func pathID(r *http.Request) (int64, bool) {
 func clean(p *Plant) string {
 	p.BotanicalName = strings.TrimSpace(p.BotanicalName)
 	if p.BotanicalName == "" {
-		return "il nome botanico è obbligatorio"
+		return "name_required"
 	}
 	if len(p.BotanicalName) > 120 || len(p.Nickname) > 120 || len(p.AcquiredAt) > 10 {
-		return "campo troppo lungo"
+		return "field_too_long"
 	}
 	for _, f := range []*string{&p.Sheet.Origine, &p.Sheet.Crescita, &p.Sheet.Luce, &p.Sheet.Temperatura,
 		&p.Sheet.Umidita, &p.Sheet.Ventilazione, &p.Sheet.Substrato, &p.Sheet.Annaffiatura, &p.Sheet.Acqua,
 		&p.Sheet.Fertilizzazione, &p.Sheet.Riposo, &p.Sheet.Fioritura, &p.Sheet.Note} {
 		if len(*f) > 2000 {
-			return "testo troppo lungo (max 2000 caratteri per campo)"
+			return "text_too_long"
 		}
 	}
 	return ""
@@ -135,7 +135,7 @@ func (s *Server) insertPlant(userID int64, p *Plant, copiedFrom any) (int64, err
 func (s *Server) handleListMine(w http.ResponseWriter, r *http.Request, u *User) {
 	ps, err := s.listPlants(`WHERE p.user_id = ? ORDER BY p.botanical_name`, u.ID)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	writeJSON(w, 200, ps)
@@ -144,7 +144,7 @@ func (s *Server) handleListMine(w http.ResponseWriter, r *http.Request, u *User)
 func (s *Server) handleExplore(w http.ResponseWriter, r *http.Request) {
 	ps, err := s.listPlants(`WHERE p.public = 1 ORDER BY p.id DESC LIMIT 100`)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	writeJSON(w, 200, ps)
@@ -161,7 +161,7 @@ func (s *Server) handleCreatePlant(w http.ResponseWriter, r *http.Request, u *Us
 	}
 	id, err := s.insertPlant(u.ID, &p, nil)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	created, _ := s.getPlant(id)
@@ -171,16 +171,16 @@ func (s *Server) handleCreatePlant(w http.ResponseWriter, r *http.Request, u *Us
 func (s *Server) handleGetPlant(w http.ResponseWriter, r *http.Request, u *User) {
 	id, ok := pathID(r)
 	if !ok {
-		writeErr(w, 400, "id non valido")
+		writeErr(w, 400, "invalid_id")
 		return
 	}
 	p, err := s.getPlant(id)
 	if err == sql.ErrNoRows || (err == nil && !p.Public && (u == nil || u.ID != p.UserID)) {
-		writeErr(w, 404, "scheda non trovata") // 404 anche per le private: non riveliamo che esistono
+		writeErr(w, 404, "not_found") // 404 anche per le private: non riveliamo che esistono
 		return
 	}
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	writeJSON(w, 200, p)
@@ -189,12 +189,12 @@ func (s *Server) handleGetPlant(w http.ResponseWriter, r *http.Request, u *User)
 func (s *Server) ownedPlant(w http.ResponseWriter, r *http.Request, u *User) (*Plant, bool) {
 	id, ok := pathID(r)
 	if !ok {
-		writeErr(w, 400, "id non valido")
+		writeErr(w, 400, "invalid_id")
 		return nil, false
 	}
 	p, err := s.getPlant(id)
 	if err != nil || p.UserID != u.ID {
-		writeErr(w, 404, "scheda non trovata")
+		writeErr(w, 404, "not_found")
 		return nil, false
 	}
 	return p, true
@@ -215,7 +215,7 @@ func (s *Server) handleUpdatePlant(w http.ResponseWriter, r *http.Request, u *Us
 	}
 	tx, err := s.db.Begin()
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	defer tx.Rollback()
@@ -232,7 +232,7 @@ func (s *Server) handleUpdatePlant(w http.ResponseWriter, r *http.Request, u *Us
 		err = tx.Commit()
 	}
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	updated, _ := s.getPlant(cur.ID)
@@ -256,7 +256,7 @@ func (s *Server) handleDeletePlant(w http.ResponseWriter, r *http.Request, u *Us
 		rows.Close()
 	}
 	if _, err := s.db.Exec(`DELETE FROM plants WHERE id = ?`, cur.ID); err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	s.removePhotos(photos...)
@@ -267,19 +267,19 @@ func (s *Server) handleDeletePlant(w http.ResponseWriter, r *http.Request, u *Us
 func (s *Server) handleCopyPlant(w http.ResponseWriter, r *http.Request, u *User) {
 	id, ok := pathID(r)
 	if !ok {
-		writeErr(w, 400, "id non valido")
+		writeErr(w, 400, "invalid_id")
 		return
 	}
 	src, err := s.getPlant(id)
 	if err != nil || (!src.Public && src.UserID != u.ID) {
-		writeErr(w, 404, "scheda non trovata")
+		writeErr(w, 404, "not_found")
 		return
 	}
 	cp := *src
 	cp.Nickname, cp.AcquiredAt, cp.Public = "", "", false
 	newID, err := s.insertPlant(u.ID, &cp, src.ID)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	created, _ := s.getPlant(newID)

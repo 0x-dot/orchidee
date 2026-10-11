@@ -13,23 +13,23 @@ export interface Plant {
   sheet: Sheet;
 }
 
-export interface FieldDef { key: string; label: string; long?: boolean; hint?: string; }
+// Etichette e suggerimenti stanno in traduzioni.csv: chiavi field.<key>.label e field.<key>.hint
+export interface FieldDef { key: string; long?: boolean; hint?: boolean; }
 
-// Stessi campi delle schede originali, nello stesso ordine
 export const SHEET_FIELDS: FieldDef[] = [
-  { key: 'origine', label: 'Origine e habitat', long: true, hint: 'Es: Madagascar e Africa orientale. Epifita in foreste umide.' },
-  { key: 'crescita', label: 'Tipo di crescita', hint: 'Es: Monopodiale, compatta' },
-  { key: 'luce', label: 'Luce', hint: 'Es: Media (8.000–12.000 lux), no sole diretto' },
-  { key: 'temperatura', label: 'Temperatura', long: true, hint: 'Giorno: 22–26 °C · Notte: 16–18 °C' },
-  { key: 'umidita', label: 'Umidità', hint: 'Es: 60–80%' },
-  { key: 'ventilazione', label: 'Ventilazione', hint: 'Es: Costante ma delicata' },
-  { key: 'substrato', label: 'Substrato / Montaggio', hint: 'Es: Bark fine in vaso trasparente' },
-  { key: 'annaffiatura', label: 'Annaffiatura', long: true, hint: 'Estate: … · Inverno: …' },
-  { key: 'acqua', label: 'Tipo di acqua', hint: 'Piovana, distillata, rubinetto decantato…' },
-  { key: 'fertilizzazione', label: 'Fertilizzazione', hint: 'Es: 20-20-20 a 1/4 dose ogni 2 annaffiature' },
-  { key: 'riposo', label: 'Riposo', hint: 'Es: Leggero in inverno' },
-  { key: 'fioritura', label: 'Fioritura', hint: 'Es: Primavera–estate, profumata di notte' },
-  { key: 'note', label: 'Note di coltivazione', long: true },
+  { key: 'origine', long: true, hint: true },
+  { key: 'crescita', hint: true },
+  { key: 'luce', hint: true },
+  { key: 'temperatura', long: true, hint: true },
+  { key: 'umidita', hint: true },
+  { key: 'ventilazione', hint: true },
+  { key: 'substrato', hint: true },
+  { key: 'annaffiatura', long: true, hint: true },
+  { key: 'acqua', hint: true },
+  { key: 'fertilizzazione', hint: true },
+  { key: 'riposo', hint: true },
+  { key: 'fioritura', hint: true },
+  { key: 'note', long: true },
 ];
 
 export function emptyPlant(): Plant {
@@ -38,18 +38,21 @@ export function emptyPlant(): Plant {
   return { id: 0, userId: 0, owner: '', botanicalName: '', nickname: '', acquiredAt: '', public: false, sheet };
 }
 
-export function errMsg(e: any): string {
-  return e?.error?.error ?? 'Qualcosa è andato storto, riprova.';
+// Restituisce la chiave di traduzione dell'errore (il server manda un codice stabile).
+export function errKey(e: any): string {
+  const code = e?.error?.error;
+  return typeof code === 'string' ? 'err.' + code : 'err.generic';
 }
 
 export interface Entry { id: number; plantId: number; date: string; kind: string; note: string; hasPhoto: boolean; }
 
-export const KINDS: { v: string; l: string; icon: string }[] = [
-  { v: 'nota', l: 'Nota', icon: '✎' },
-  { v: 'radice', l: 'Nuova radice', icon: '🌱' },
-  { v: 'foglia', l: 'Nuova foglia', icon: '🍃' },
-  { v: 'spiga', l: 'Spiga fiorale', icon: '🌾' },
-  { v: 'fioritura', l: 'Fioritura', icon: '🌸' },
-  { v: 'rinvaso', l: 'Rinvaso', icon: '🪴' },
-  { v: 'trattamento', l: 'Trattamento', icon: '💧' },
+// L'etichetta di ogni tipo è la chiave kind.<v>
+export const KINDS: { v: string; icon: string }[] = [
+  { v: 'nota', icon: '✎' },
+  { v: 'radice', icon: '🌱' },
+  { v: 'foglia', icon: '🍃' },
+  { v: 'germoglio', icon: '🌿' },
+  { v: 'fioritura', icon: '🌸' },
+  { v: 'rinvaso', icon: '🪴' },
+  { v: 'trattamento', icon: '💧' },
 ];

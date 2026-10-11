@@ -13,7 +13,7 @@ export class PlantsApi {
   update(p: Plant) { return firstValueFrom(this.http.put<Plant>(`/api/plants/${p.id}`, p)); }
   remove(id: number) { return firstValueFrom(this.http.delete<void>(`/api/plants/${id}`)); }
   copy(id: number) { return firstValueFrom(this.http.post<Plant>(`/api/plants/${id}/copy`, {})); }
-  seed() { return firstValueFrom(this.http.post<{ added: number }>('/api/seed', {})); }
+  seed(lang: string) { return firstValueFrom(this.http.post<{ added: number }>('/api/seed?lang=' + lang, {})); }
   timeline(plantId: number) { return firstValueFrom(this.http.get<Entry[]>(`/api/plants/${plantId}/timeline`)); }
   addEntry(plantId: number, form: FormData) { return firstValueFrom(this.http.post<Entry>(`/api/plants/${plantId}/timeline`, form)); }
   removeEntry(id: number) { return firstValueFrom(this.http.delete<void>(`/api/timeline/${id}`)); }

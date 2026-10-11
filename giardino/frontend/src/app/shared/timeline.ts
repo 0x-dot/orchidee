@@ -1,6 +1,7 @@
 import { Component, ElementRef, effect, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Entry, errMsg, KINDS } from '../models';
+import { I18n, TPipe } from '../i18n';
+import { Entry, errKey, KINDS } from '../models';
 import { PlantsApi } from '../plants-api';
 
 // Ridimensiona nel browser: createImageBitmap rispetta l'orientamento EXIF, così le foto da telefono non escono ruotate.
@@ -21,34 +22,34 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 @Component({
   selector: 'app-timeline',
-  imports: [FormsModule],
+  imports: [FormsModule, TPipe],
   template: `
     <section class="tl">
-      <h2 class="title">Storico di crescita</h2>
+      <h2 class="title">{{ 'timeline.title' | t }}</h2>
 
       @if (editable()) {
         <details class="paper add noprint" [open]="entries().length === 0">
-          <summary>+ Aggiungi una voce</summary>
+          <summary>{{ 'timeline.add' | t }}</summary>
           <form (ngSubmit)="add()">
             <div class="two">
-              <label class="f">Data <input name="d" type="date" [(ngModel)]="date" required></label>
-              <label class="f">Cosa è successo
+              <label class="f">{{ 'timeline.date' | t }} <input name="d" type="date" [(ngModel)]="date" required></label>
+              <label class="f">{{ 'timeline.kind' | t }}
                 <select name="k" [(ngModel)]="kind">
-                  @for (k of kinds; track k.v) { <option [value]="k.v">{{ k.icon }} {{ k.l }}</option> }
+                  @for (k of kinds; track k.v) { <option [value]="k.v">{{ k.icon }} {{ 'kind.' + k.v | t }}</option> }
                 </select>
               </label>
             </div>
-            <label class="f">Nota <textarea name="n" rows="2" [(ngModel)]="note" maxlength="2000" placeholder="Es: due nuove radici verdi, spuntata la terza foglia…"></textarea></label>
-            <label class="f">Foto <input #file type="file" accept="image/*" (change)="pick($event)"></label>
-            @if (preview()) { <img class="prev" [src]="preview()" alt="anteprima"> }
-            @if (error()) { <p class="error">{{ error() }}</p> }
-            <button class="btn" [disabled]="busy()">{{ busy() ? 'Salvo…' : 'Aggiungi allo storico' }}</button>
+            <label class="f">{{ 'timeline.note' | t }} <textarea name="n" rows="2" [(ngModel)]="note" maxlength="2000" [placeholder]="'timeline.notePh' | t"></textarea></label>
+            <label class="f">{{ 'timeline.photo' | t }} <input #file type="file" accept="image/*" (change)="pick($event)"></label>
+            @if (preview()) { <img class="prev" [src]="preview()" [alt]="'timeline.preview' | t"> }
+            @if (error()) { <p class="error">{{ error() | t }}</p> }
+            <button class="btn" [disabled]="busy()">{{ (busy() ? 'timeline.saving' : 'timeline.submit') | t }}</button>
           </form>
         </details>
       }
 
       @if (entries().length === 0) {
-        <p class="muted">Ancora nessuna voce nello storico.</p>
+        <p class="muted">{{ 'timeline.empty' | t }}</p>
       } @else {
         <ol class="film">
           @for (e of entries(); track e.id) {
@@ -56,15 +57,15 @@ const today = () => new Date().toISOString().slice(0, 10);
               <div class="plate paper">
                 <div class="row between">
                   <span class="catno">{{ fmt(e.date) }}</span>
-                  <span class="badge">{{ icon(e.kind) }} {{ label(e.kind) }}</span>
+                  <span class="badge">{{ icon(e.kind) }} {{ 'kind.' + e.kind | t }}</span>
                 </div>
                 @if (e.hasPhoto) {
                   <a [href]="'/api/timeline/' + e.id + '/photo'" target="_blank" rel="noopener">
-                    <img [src]="'/api/timeline/' + e.id + '/photo'" loading="lazy" [alt]="label(e.kind) + ' del ' + fmt(e.date)">
+                    <img [src]="'/api/timeline/' + e.id + '/photo'" loading="lazy" [alt]="('kind.' + e.kind | t) + ' · ' + fmt(e.date)">
                   </a>
                 }
                 @if (e.note) { <p class="note">{{ e.note }}</p> }
-                @if (editable()) { <button class="btn danger small noprint" (click)="remove(e)">Elimina</button> }
+                @if (editable()) { <button class="btn danger small noprint" (click)="remove(e)">{{ 'detail.delete' | t }}</button> }
               </div>
             </li>
           }
@@ -93,6 +94,7 @@ export class Timeline {
   plantId = input.required<number>();
   editable = input(false);
   private api = inject(PlantsApi);
+  private i18n = inject(I18n);
   private fileInput = viewChild<ElementRef<HTMLInputElement>>('file');
 
   entries = signal<Entry[]>([]);
@@ -112,8 +114,7 @@ export class Timeline {
     });
   }
 
-  fmt(d: string) { return new Date(d + 'T12:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }); }
-  label(k: string) { return KINDS.find(x => x.v === k)?.l ?? k; }
+  fmt(d: string) { return this.i18n.date(d); }
   icon(k: string) { return KINDS.find(x => x.v === k)?.icon ?? '✎'; }
 
   async pick(ev: Event) {
@@ -123,11 +124,11 @@ export class Timeline {
     try {
       this.photo = await shrink(f);
       this.preview.set(URL.createObjectURL(this.photo));
-    } catch { this.error.set('Impossibile leggere questa immagine (HEIC non è supportato: usa JPG, PNG o WebP).'); }
+    } catch { this.error.set('timeline.unreadable'); }
   }
 
   async add() {
-    if (!this.note.trim() && !this.photo) { this.error.set('Aggiungi una nota o una foto.'); return; }
+    if (!this.note.trim() && !this.photo) { this.error.set('timeline.needContent'); return; }
     const fd = new FormData();
     fd.append('date', this.date);
     fd.append('kind', this.kind);
@@ -139,13 +140,13 @@ export class Timeline {
       this.entries.set(await this.api.timeline(this.plantId()));
       this.note = ''; this.kind = 'nota'; this.date = today(); this.photo = null; this.preview.set('');
       const el = this.fileInput()?.nativeElement; if (el) el.value = '';
-    } catch (e) { this.error.set(errMsg(e)); }
+    } catch (e) { this.error.set(errKey(e)); }
     this.busy.set(false);
   }
 
   async remove(e: Entry) {
-    if (!confirm('Eliminare questa voce dallo storico?')) return;
+    if (!confirm(this.i18n.t('timeline.confirmDelete'))) return;
     try { await this.api.removeEntry(e.id); this.entries.update(l => l.filter(x => x.id !== e.id)); }
-    catch (err) { this.error.set(errMsg(err)); }
+    catch (err) { this.error.set(errKey(err)); }
   }
 }

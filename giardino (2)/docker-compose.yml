@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      COOKIE_SECURE: "0"        # metti "1" solo quando c'è HTTPS davanti
+    volumes:
+      - giardino-data:/data     # garden.db + photos/
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  giardino-data:

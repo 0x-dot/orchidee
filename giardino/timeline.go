@@ -27,9 +27,14 @@ const (
 )
 
 var validKinds = map[string]bool{
-	"nota": true, "radice": true, "foglia": true, "spiga": true,
+	"nota": true, "radice": true, "foglia": true, "germoglio": true,
 	"fioritura": true, "rinvaso": true, "trattamento": true,
 }
+
+// apiErr è un errore con un codice stabile che il frontend traduce.
+type apiErr string
+
+func (e apiErr) Error() string { return string(e) }
 
 type Entry struct {
 	ID       int64  `json:"id"`
@@ -46,17 +51,17 @@ func (s *Server) photoDir() string { return filepath.Join(s.dataDir, "photos") }
 func (s *Server) savePhoto(f multipart.File) (string, error) {
 	cfg, _, err := image.DecodeConfig(f)
 	if err != nil {
-		return "", errors.New("formato non supportato: usa JPG, PNG o WebP")
+		return "", apiErr("photo_format")
 	}
 	if cfg.Width > maxSourcePx || cfg.Height > maxSourcePx {
-		return "", errors.New("immagine troppo grande")
+		return "", apiErr("photo_too_large")
 	}
 	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		return "", err
 	}
 	img, _, err := image.Decode(f)
 	if err != nil {
-		return "", errors.New("immagine non valida")
+		return "", apiErr("photo_invalid")
 	}
 
 	b := img.Bounds()
@@ -111,18 +116,18 @@ func (s *Server) removePhotos(names ...string) {
 func (s *Server) handleListTimeline(w http.ResponseWriter, r *http.Request, u *User) {
 	id, ok := pathID(r)
 	if !ok {
-		writeErr(w, 400, "id non valido")
+		writeErr(w, 400, "invalid_id")
 		return
 	}
 	p, err := s.getPlant(id)
 	if err != nil || (!p.Public && (u == nil || u.ID != p.UserID)) {
-		writeErr(w, 404, "scheda non trovata")
+		writeErr(w, 404, "not_found")
 		return
 	}
 	rows, err := s.db.Query(`SELECT id, plant_id, entry_date, kind, note, photo_path != ''
 		FROM timeline_entries WHERE plant_id = ? ORDER BY entry_date DESC, id DESC`, id)
 	if err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	defer rows.Close()
@@ -130,7 +135,7 @@ func (s *Server) handleListTimeline(w http.ResponseWriter, r *http.Request, u *U
 	for rows.Next() {
 		var e Entry
 		if err := rows.Scan(&e.ID, &e.PlantID, &e.Date, &e.Kind, &e.Note, &e.HasPhoto); err != nil {
-			writeErr(w, 500, "errore interno")
+			writeErr(w, 500, "internal")
 			return
 		}
 		out = append(out, e)
@@ -145,7 +150,7 @@ func (s *Server) handleAddEntry(w http.ResponseWriter, r *http.Request, u *User)
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, maxUpload)
 	if err := r.ParseMultipartForm(maxUpload); err != nil {
-		writeErr(w, 400, "richiesta non valida o foto troppo pesante (max 8 MB)")
+		writeErr(w, 400, "upload_too_big")
 		return
 	}
 	date := r.FormValue("date")
@@ -153,7 +158,7 @@ func (s *Server) handleAddEntry(w http.ResponseWriter, r *http.Request, u *User)
 		date = time.Now().Format("2006-01-02")
 	}
 	if _, err := time.Parse("2006-01-02", date); err != nil {
-		writeErr(w, 400, "data non valida")
+		writeErr(w, 400, "invalid_date")
 		return
 	}
 	kind := r.FormValue("kind")
@@ -161,12 +166,12 @@ func (s *Server) handleAddEntry(w http.ResponseWriter, r *http.Request, u *User)
 		kind = "nota"
 	}
 	if !validKinds[kind] {
-		writeErr(w, 400, "tipo non valido")
+		writeErr(w, 400, "invalid_kind")
 		return
 	}
 	note := strings.TrimSpace(r.FormValue("note"))
 	if len(note) > 2000 {
-		writeErr(w, 400, "nota troppo lunga (max 2000 caratteri)")
+		writeErr(w, 400, "text_too_long")
 		return
 	}
 
@@ -174,12 +179,17 @@ func (s *Server) handleAddEntry(w http.ResponseWriter, r *http.Request, u *User)
 	if f, _, err := r.FormFile("photo"); err == nil {
 		defer f.Close()
 		if photo, err = s.savePhoto(f); err != nil {
-			writeErr(w, 400, err.Error())
+			var ae apiErr
+			if errors.As(err, &ae) {
+				writeErr(w, 400, string(ae))
+			} else {
+				writeErr(w, 500, "internal")
+			}
 			return
 		}
 	}
 	if note == "" && photo == "" {
-		writeErr(w, 400, "aggiungi una nota o una foto")
+		writeErr(w, 400, "empty_entry")
 		return
 	}
 
@@ -187,7 +197,7 @@ func (s *Server) handleAddEntry(w http.ResponseWriter, r *http.Request, u *User)
 		p.ID, date, kind, note, photo)
 	if err != nil {
 		s.removePhotos(photo)
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	id, _ := res.LastInsertId()
@@ -205,16 +215,16 @@ func (s *Server) entryAccess(id int64) (photo string, ownerID int64, public bool
 func (s *Server) handleDeleteEntry(w http.ResponseWriter, r *http.Request, u *User) {
 	id, ok := pathID(r)
 	if !ok {
-		writeErr(w, 400, "id non valido")
+		writeErr(w, 400, "invalid_id")
 		return
 	}
 	photo, ownerID, _, err := s.entryAccess(id)
 	if err != nil || ownerID != u.ID {
-		writeErr(w, 404, "voce non trovata")
+		writeErr(w, 404, "not_found")
 		return
 	}
 	if _, err := s.db.Exec(`DELETE FROM timeline_entries WHERE id = ?`, id); err != nil {
-		writeErr(w, 500, "errore interno")
+		writeErr(w, 500, "internal")
 		return
 	}
 	s.removePhotos(photo)
