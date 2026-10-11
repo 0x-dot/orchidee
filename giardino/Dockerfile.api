@@ -1,0 +1,15 @@
+# Solo API Go + SQLite (senza frontend). Pensato per essere usato con docker-compose.
+FROM golang:1.23-alpine AS build
+WORKDIR /src
+COPY . .
+# go:embed richiede la cartella: la sostituisco con un segnaposto, il frontend lo serve nginx
+RUN rm -rf web/dist/browser frontend && mkdir -p web/dist/browser \
+ && echo '<!doctype html><title>API</title>Questo container serve solo /api' > web/dist/browser/index.html
+RUN go mod tidy && CGO_ENABLED=0 go build -o /giardino .
+
+FROM alpine:3.20
+COPY --from=build /giardino /giardino
+ENV DATA_DIR=/data ADDR=:8080
+VOLUME /data
+EXPOSE 8080
+CMD ["/giardino"]

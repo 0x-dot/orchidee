@@ -1,0 +1,12 @@
+.topbar { display:flex; flex-wrap:wrap; gap:.6rem 1.5rem; align-items:center; justify-content:space-between;
+  padding:.9rem 1.4rem; background:var(--sage-dark); color:#f3ecd9; border-bottom:4px double var(--seppia); }
+.brand { color:#f3ecd9; text-decoration:none; font-size:1.35rem; font-style:italic; }
+.brand small { display:block; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; font-style:normal; opacity:.75; }
+.leaf { color:var(--gold); }
+nav { display:flex; gap:1rem; align-items:center; }
+nav a { color:#f3ecd9; text-decoration:none; padding:.2rem .1rem; border-bottom:2px solid transparent; }
+nav a:hover, nav a.on { border-bottom-color:var(--gold); }
+.who { font-style:italic; opacity:.8; }
+.page { max-width:1000px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
+.foot { text-align:center; padding:1.2rem; color:var(--seppia); font-size:.85rem; }
+@media print { .topbar, .foot { display:none; } }

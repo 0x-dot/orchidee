@@ -1,0 +1,4 @@
+data/
+.git/
+frontend/node_modules/
+frontend/.angular/

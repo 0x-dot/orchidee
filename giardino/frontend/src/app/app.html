@@ -1,0 +1,17 @@
+<header class="topbar">
+  <a routerLink="/" class="brand"><span class="leaf">❦</span> Digital garden <small>serra · schede di allevamento</small></a>
+  <nav>
+    @if (auth.user(); as u) {
+      <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{exact: true}">Il mio giardino</a>
+      <a routerLink="/esplora" routerLinkActive="on">Esplora</a>
+      <a routerLink="/etichette" routerLinkActive="on">Etichette</a>
+      <span class="who">{{ u.username }}</span>
+      <button class="btn ghost small" (click)="logout()">Esci</button>
+    } @else {
+      <a routerLink="/esplora" routerLinkActive="on">Esplora</a>
+      <a routerLink="/accedi" routerLinkActive="on">Accedi</a>
+    }
+  </nav>
+</header>
+<main class="page"><router-outlet /></main>
+<footer class="foot">Fatto con cura per le orchidee · <span class="leaf">❦</span></footer>
